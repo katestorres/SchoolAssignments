@@ -39,6 +39,12 @@ def twig(berry, width, iter):
         elif(i=='['):
             saved.append([berry.heading(), berry.xcor(), berry.ycor()])
         elif(i==']'):
+            berry.color("light pink")
+            berry.forward(width)
+            berry.begin_fill()
+            berry.circle(width)
+            berry.end_fill()
+            berry.color("black")
             berry.penup()
             new = saved.pop()
             berry.setheading(new[0])
