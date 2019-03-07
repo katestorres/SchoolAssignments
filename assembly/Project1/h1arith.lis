@@ -1,0 +1,157 @@
+     1                                  ;Author name: Kate Torres
+     2                                  ;Program title: Starting out with X86
+     3                                  ;Files in this program: h1driver.c, h1arith.asm, h1bash.sh
+     4                                  ;Course number: CPSC 240
+     5                                  ;Assigment number: 1
+     6                                  ;Required delievery date: Feb 4, 2019 before 11:59pm
+     7                                  ;Purpose: Learn how to embed C library function calls in an X86 module.
+     8                                  ;Language of this module: X86 with Intel syntax
+     9                                  ;Compile this module: nasm -f elf64 -l h1arith.lis -o h1arith.o h1arith.asm
+    10                                  
+    11                                  extern printf				;Be able to use C function printf
+    12                                  extern scanf				;Be able to use C function scanf
+    13                                  global h1arith				;Enable program to be called from outside the function
+    14                                  segment .data				;Initialize data here
+    15                                  
+    16                                  ;===================Declare messages===============
+    17                                  
+    18                                  
+    19 00000000 506C6561736520656E-     firstprompt db "Please enter the first integer:", 10, 0
+    19 00000009 746572207468652066-
+    19 00000012 6972737420696E7465-
+    19 0000001B 6765723A0A00       
+    20                                  
+    21 00000021 506C6561736520656E-     secondprompt db "Please enter the second integer:", 10, 0
+    21 0000002A 746572207468652073-
+    21 00000033 65636F6E6420696E74-
+    21 0000003C 656765723A0A00     
+    22                                  
+    23 00000043 5468652070726F6475-     product db "The product of these two integers is: %ld", 10, 0
+    23 0000004C 6374206F6620746865-
+    23 00000055 73652074776F20696E-
+    23 0000005E 746567657273206973-
+    23 00000067 3A20256C640A00     
+    24                                  
+    25 0000006E 5468652071756F7469-     quotient db "The quotient of these two integeres is %ld with the remainder %ld:", 10,0
+    25 00000077 656E74206F66207468-
+    25 00000080 6573652074776F2069-
+    25 00000089 6E7465676572657320-
+    25 00000092 697320256C64207769-
+    25 0000009B 746820746865207265-
+    25 000000A4 6D61696E6465722025-
+    25 000000AD 6C643A0A00         
+    26                                  
+    27 000000B2 546869732061737365-     goodbye db "This assembly function will now return to the driver", 10, 0
+    27 000000BB 6D626C792066756E63-
+    27 000000C4 74696F6E2077696C6C-
+    27 000000CD 206E6F772072657475-
+    27 000000D6 726E20746F20746865-
+    27 000000DF 206472697665720A00 
+    28                                  
+    29 000000E8 257300                  stringformat db "%s", 0			;General string format
+    30                                  
+    31 000000EB 256C6400                eightbyteformat db "%ld", 0		;General 8 byte format
+    32                                  
+    33                                  ;--------------------------------------------------
+    34                                  
+    35                                  segment .bss 
+    36                                  
+    37                                  ;This section is empty
+    38                                  
+    39                                  ;==================================================
+    40                                  ;====================Begin=========================
+    41                                  ;==================================================
+    42                                  
+    43                                  segment .text				;Executable instructions
+    44                                   
+    45                                  h1arith:				;Execution begins here
+    46                                  
+    47                                  ;Next two instruction required
+    48 00000000 55                      push	rbp				;Marks the start of a new stack
+    49 00000001 4889E5                  mov	rbp, rsp			;rbp holds the addresses of the stack frame
+    50                                  
+    51 00000004 6A00                    push 	qword 0				;Ints are qwords
+    52                                  
+    53                                  ;---------------------------------------------------
+    54                                  
+    55                                  ;Print firstprompt
+    56                                  ;Not understanding why it's outputting 19Torres here
+    57                                  
+    58 00000006 B800000000              mov qword 	rax, 0			;No data from SSE will be printed
+    59 0000000B 48BF-                   mov		rdi, stringformat	;"%s"
+    59 0000000D [E800000000000000] 
+    60 00000015 48BE-                   mov		rsi, firstprompt	;Push firstprompt into the stack
+    60 00000017 [0000000000000000] 
+    61 0000001F E8(00000000)            call		printf			;Print firstprompt
+    62                                  
+    63                                  ;Scan first integer
+    64 00000024 6A00                    push qword	0			;push 64 0's onto stack
+    65 00000026 BF00000000              mov qword	rdi, 0			;SSE is not involved in this operation
+    66 0000002B 48BF-                   mov 		rdi, eightbyteformat	;"%ld"
+    66 0000002D [EB00000000000000] 
+    67 00000035 4889E6                  mov		rsi, rsp		;Give scanf a pointer to the reserved space
+    68 00000038 E8(00000000)            call 		scanf			;get input
+    69 0000003D 415C                    pop 		r12			;store input to r12
+    70                                  
+    71                                  ;Print secondprompt
+    72                                  ;Segmentation fault here xFIXED
+    73 0000003F B800000000              mov qword 	rax, 0			;No data from SSE will be printed
+    74 00000044 48BF-                   mov		rdi, stringformat	;"%s"
+    74 00000046 [E800000000000000] 
+    75 0000004E 48BE-                   mov		rsi, secondprompt	;Push secondprompt into the stack
+    75 00000050 [2100000000000000] 
+    76 00000058 E8(00000000)            call		printf			;Print secondprompt
+    77                                  
+    78                                  ;Scan second integer
+    79                                  ;Issue here, not letting me read the second input, says 0 instead
+    80                                  ;throwing error that you can't divide by 0
+    81 0000005D 6A00                    push qword	0			;push 64 0's onto stack
+    82 0000005F BF00000000              mov qword	rdi, 0			;SSE is not involved in this operation
+    83 00000064 48BF-                   mov 		rdi, eightbyteformat	;"%ld"
+    83 00000066 [EB00000000000000] 
+    84 0000006E 4889E6                  mov		rsi, rsp		;Give scanf a pointer to the reserved space
+    85 00000071 E8(00000000)            call 		scanf			;get input
+    86 00000076 415E                    pop 		r14			;store input to r14
+    87                                  
+    88                                  ;pop		rax			;Open up space used by scanf
+    89                                  
+    90                                  ;Multiply integers
+    91 00000078 4D89E7                  mov		r15, r12		;copy r12 into r15 for later
+    92 0000007B 4D0FAFE6                imul		r12, r14		;multiply r12 by r14, store in r12
+    93                                  
+    94                                  ;Display product
+    95 0000007F B800000000              mov qword 	rax, 0			
+    96 00000084 48BF-                   mov		rdi, product		;move product statement to rdi
+    96 00000086 [4300000000000000] 
+    97 0000008E 4C89E6                  mov		rsi, r12		;move product answer to rsi
+    98 00000091 E8(00000000)            call		printf			;Print product statement
+    99                                  
+   100                                  ;Divide integers
+   101 00000096 4C89F8                  mov		rax, r15		;mov r15 into rax
+   102 00000099 4899                    cqo					;extend rax to rdx
+   103 0000009B 49F7FE                  idiv		r14			;divide rax by r14, store in rdx and rax
+   104 0000009E 4989C1                  mov		r9, rax			;store quotient in r9
+   105 000000A1 4989D7                  mov		r15, rdx		;move remainder to r15
+   106                                  
+   107                                  ;Display quotient and remainder
+   108 000000A4 B800000000              mov qword 	rax, 0			
+   109 000000A9 48BF-                   mov		rdi, quotient		;move quotient statement to rdi
+   109 000000AB [6E00000000000000] 
+   110 000000B3 4C89CE                  mov		rsi, r9 	    	;move quotient answer to rsi
+   111 000000B6 4C89FA                  mov		rdx, r15		;move remainder answer to rsp
+   112 000000B9 E8(00000000)            call		printf			;Print quotient
+   113                                  
+   114                                  ;Exit statement
+   115 000000BE B800000000              mov qword 	rax, 0			
+   116 000000C3 48BF-                   mov		rdi, goodbye 		;move goodbye statement to rdi
+   116 000000C5 [B200000000000000] 
+   117 000000CD 58                      pop		rax
+   118 000000CE E8(00000000)            call 		printf			;print goodbye
+   119                                  
+   120                                  
+   121                                  ;Copy number to rax
+   122                                  ;mov		rax, r15 		;is already there?	
+   123                                  
+   124                                  ;Return to driver
+   125 000000D3 5D                      pop		rbp			;return stack to start
+   126 000000D4 C3                      ret					;return to driver
