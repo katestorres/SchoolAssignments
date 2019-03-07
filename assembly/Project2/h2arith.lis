@@ -1,0 +1,188 @@
+     1                                  ;Author name: Kate Torres
+     2                                  ;Program name: Sum of a Sequence
+     3                                  ;Names of the files in this programming: h2arith.asm, h2bash.sh, h2driver.cpp
+     4                                  ;Course number: CPSC 240
+     5                                  ;Scheduled delivery date: February 18, 2019
+     6                                  ;Program purpose: Computer the sum of an sequence of signed integers
+     7                                  ;Status: In progress
+     8                                  ;Date of last modification: February 10, 2019
+     9                                  ;============================================
+    10                                  ;Information about this module:
+    11                                  ;File name of this module: h2arith.asm
+    12                                  ;Lanugage of this module: X86 with Intel Syntax
+    13                                  ;Compile this module: nasm -f elf64 -l h2arith.lis -o h2arith.o h2arith.asm
+    14                                  ;============================================
+    15                                  
+    16                                  extern printf				;Be able to use C function printf
+    17                                  extern scanf				;Be able to use C function scanf
+    18                                  global h2arith				;Enable program to be called from outside the function
+    19                                  
+    20                                  ;===================Declare messages===============
+    21                                  
+    22                                  segment .data				;Initialize data here
+    23                                  
+    24                                  
+    25                                  
+    26 00000000 546865206661737420-     mess1 db "The fast accumulator program written in X86 Intel language has begun", 10, 0
+    26 00000009 616363756D756C6174-
+    26 00000012 6F722070726F677261-
+    26 0000001B 6D207772697474656E-
+    26 00000024 20696E205838362049-
+    26 0000002D 6E74656C206C616E67-
+    26 00000036 756167652068617320-
+    26 0000003F 626567756E0A00     
+    27                                  
+    28 00000046 496E73747275637469-     mess2 db "Instructions: Enter a sequence of integers. Include a white space between each number", 10, 0
+    28 0000004F 6F6E733A20456E7465-
+    28 00000058 722061207365717565-
+    28 00000061 6E6365206F6620696E-
+    28 0000006A 7465676572732E2049-
+    28 00000073 6E636C756465206120-
+    28 0000007C 776869746520737061-
+    28 00000085 636520626574776565-
+    28 0000008E 6E2065616368206E75-
+    28 00000097 6D6265720A00       
+    29                                  
+    30 0000009D 546F207465726D696E-     mess3 db "To terminate press 'Enter' followed by Control+D", 10, 0
+    30 000000A6 617465207072657373-
+    30 000000AF 2027456E7465722720-
+    30 000000B8 666F6C6C6F77656420-
+    30 000000C1 627920436F6E74726F-
+    30 000000CA 6C2B440A00         
+    31                                  
+    32 000000CF 456E74657220696E74-     enterprompt db "Enter integer: ", 10, 0
+    32 000000D8 656765723A200A00   
+    33                                  
+    34 000000E0 5468616E6B20796F75-     messsum db "Thank you. You entered %ld numbers with a sum equal to %ld.", 10, 0
+    34 000000E9 2E20596F7520656E74-
+    34 000000F2 6572656420256C6420-
+    34 000000FB 6E756D626572732077-
+    34 00000104 69746820612073756D-
+    34 0000010D 20657175616C20746F-
+    34 00000116 20256C642E0A00     
+    35                                  
+    36 0000011D 546865205838362066-     messex db "The X86 function will now return to the caller function. Bye.", 10, 0
+    36 00000126 756E6374696F6E2077-
+    36 0000012F 696C6C206E6F772072-
+    36 00000138 657475726E20746F20-
+    36 00000141 7468652063616C6C65-
+    36 0000014A 722066756E6374696F-
+    36 00000153 6E2E204279652E0A00 
+    37                                  
+    38 0000015C 257300                  stringformat db "%s", 0			;General string format
+    39                                  
+    40 0000015F 256C6400                eightbyteformat db "%ld", 0		;General 8-byte format
+    41                                  
+    42                                  ;=================================================
+    43                                  
+    44                                  segment .bss
+    45                                  
+    46                                  ;this segment is empty
+    47                                  
+    48                                  ;==================================================
+    49                                  ;====================Begin=========================
+    50                                  ;==================================================
+    51                                  
+    52                                  segment .text				;Executable instructions
+    53                                   
+    54                                  h2arith:				;Execution begins here
+    55                                  
+    56                                  ;Next two instruction required
+    57 00000000 55                      push		rbp			;Marks the start of a new stack
+    58 00000001 4889E5                  mov		rbp, rsp		;rbp holds the addresses of the stack frame
+    59                                  
+    60 00000004 6A00                    push 		qword 0			;Ints are qwords
+    61                                  
+    62                                  ;---------------------------------------------------
+    63                                  
+    64                                  ;Print mess1
+    65 00000006 B800000000              mov qword 	rax, 0			;No data from SSE will be printed
+    66 0000000B 48BF-                   mov		rdi, stringformat	;"%s"
+    66 0000000D [5C01000000000000] 
+    67 00000015 48BE-                   mov		rsi, mess1		;Push mess1 into the stack
+    67 00000017 [0000000000000000] 
+    68 0000001F E8(00000000)            call		printf			;Print mess1
+    69                                  
+    70                                  ;Print mess2
+    71 00000024 B800000000              mov qword	rax, 0			;No data from SSE will be printed
+    72 00000029 48BF-                   mov		rdi, stringformat	;"%s"
+    72 0000002B [5C01000000000000] 
+    73 00000033 48BE-                   mov		rsi, mess2		;Push mess2 into stack
+    73 00000035 [4600000000000000] 
+    74 0000003D E8(00000000)            call 		printf			;Print mess2
+    75                                  
+    76                                  ;Print mess3
+    77 00000042 B800000000              mov qword	rax, 0			;No data from SSE will be printed
+    78 00000047 48BF-                   mov		rdi, stringformat	;"%s"
+    78 00000049 [5C01000000000000] 
+    79 00000051 48BE-                   mov		rsi, mess3		;Push mess3 into stack
+    79 00000053 [9D00000000000000] 
+    80 0000005B E8(00000000)            call		printf			;Push mess3
+    81                                  
+    82                                  ;Make variables
+    83 00000060 41BC00000000            mov		r12, 0 			;total
+    84 00000066 41BD00000000            mov		r13, 0			;counter
+    85                                  
+    86                                  startofloop:
+    87                                  
+    88                                  ;Enter integers
+    89                                  
+    90                                  ;Print enterprompt
+    91 0000006C B800000000              mov qword	rax, 0			;No data from SSE will be printed
+    92 00000071 48BF-                   mov		rdi, stringformat	;"%s"
+    92 00000073 [5C01000000000000] 
+    93 0000007B 48BE-                   mov		rsi, enterprompt	;Push enterprompt into the stack
+    93 0000007D [CF00000000000000] 
+    94 00000085 E8(00000000)            call		printf			;Print enterprompt
+    95                                  
+    96                                  ;Take input
+    97 0000008A 6A00                    push qword	0			;Push 64 0's onto the stack
+    98 0000008C BF00000000              mov qword	rdi, 0			;SSE is not involved
+    99 00000091 48BF-                   mov		rdi, eightbyteformat	;"%ld"
+    99 00000093 [5F01000000000000] 
+   100 0000009B 4889E6                  mov		rsi, rsp		;Give scanf a pointer to reserved space
+   101 0000009E E8(00000000)            call		scanf			;Get input
+   102                                  
+   103                                  ;Check for control+D
+   104 000000A3 99                      cdq					;Place into rdx sign-extension of that 32 bit integer
+   105 000000A4 48C1E220                shl 		rdx, 32			;Shift sign extension 32 bits to the left
+   106 000000A8 4809D0                  or 		rax, rdx		;Perform the operation to rax = rax or rdx
+   107 000000AB 4883F8FF                cmp		rax, -1			;Compare with -1
+   108                                  
+   109 000000AF 740A                    je		endofloop		;End loop
+   110                                  
+   111 000000B1 415F                    pop		r15			;Store input to r15
+   112                                  
+   113                                  ;If integer input
+   114 000000B3 49FFC5                  inc		r13			;Increment counter by one
+   115 000000B6 4D01FC                  add		r12, r15		;Add r15 to r12
+   116 000000B9 EBB1                    jmp 		startofloop		;return to start of loop
+   117                                  
+   118                                  
+   119                                  ;Exit out of function
+   120                                  endofloop:				;Loop ends here
+   121 000000BB 58                      pop		rax			;Open space up used by scanf
+   122                                  
+   123                                  ;Print messsum
+   124 000000BC B800000000              mov qword	rax, 0			;No data from SSE will be printed
+   125 000000C1 48BF-                   mov		rdi, messsum		;Push messsum into stack
+   125 000000C3 [E000000000000000] 
+   126 000000CB 4C89EE                  mov		rsi, r13		;Push counter into stack
+   127 000000CE 4C89E2                  mov		rdx, r12		;Push total into stack
+   128 000000D1 E8(00000000)            call 		printf			;Print messsum
+   129                                  
+   130                                  ;Print messex
+   131 000000D6 B800000000              mov qword	rax, 0			;No data from SSE will be printed
+   132 000000DB 48BF-                   mov		rdi, stringformat	;"%s"
+   132 000000DD [5C01000000000000] 
+   133 000000E5 48BE-                   mov		rsi, messex		;Push messex into stack
+   133 000000E7 [1D01000000000000] 
+   134 000000EF 58                      pop		rax			;match the top push rax
+   135 000000F0 E8(00000000)            call 		printf			;Print messex
+   136                                  
+   137                                  ;Move total to rax
+   138 000000F5 4C89E0                  mov		rax, r12		;Move r12 to rax		
+   139                                  
+   140                                  ;Return to driver
+   141 000000F8 5D                      pop		rbp			;Return stack to start
+   142 000000F9 C3                      ret					;Return to driver
